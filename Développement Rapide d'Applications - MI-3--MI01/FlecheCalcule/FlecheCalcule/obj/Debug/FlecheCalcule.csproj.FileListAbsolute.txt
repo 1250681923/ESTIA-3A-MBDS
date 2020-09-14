@@ -1,0 +1,9 @@
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\bin\Debug\FlecheCalcule.exe
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\bin\Debug\FlecheCalcule.pdb
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.csprojAssemblyReference.cache
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.Form1.resources
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.Properties.Resources.resources
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.csproj.GenerateResource.cache
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.csproj.CoreCompileInputs.cache
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.exe
+C:\Users\12506\source\repos\FlecheCalcule\FlecheCalcule\obj\Debug\FlecheCalcule.pdb

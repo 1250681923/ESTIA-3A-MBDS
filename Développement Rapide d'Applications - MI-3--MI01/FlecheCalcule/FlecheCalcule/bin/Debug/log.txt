@@ -1,0 +1,3 @@
+2020/9/10 22:03:41:rectangulaire poutre(longueur,largueur,hauteur):3432234234. Charge:234. La fleche:0.060094532627866
+2020/9/10 22:15:55:rectangulaire poutre(longueur,largueur,hauteur):234, 213, 213. Charge:12. La fleche:1.99195322812371E-06
+2020/9/10 22:49:32:rectangulaire poutre(longueur,largueur,hauteur):121, 1212, 12121. Charge:12121. La fleche:1.83390504880157E-10

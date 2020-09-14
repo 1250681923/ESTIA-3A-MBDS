@@ -1,0 +1,17 @@
+﻿Acier de construction:210
+Acier à ressorts:220
+Acier inoxydable 18-10:203
+Bronze (cuivre + 9 à 12% d'étain):124
+Bronze au béryllium:130
+Cuivre laminé U4 (Recuit):90
+Cuivre laminé U4 (Écroui dur):150
+Duralumin AU4G:75
+Fontes:83
+Hastelloy B2 (Ni + Mo):217
+Hastelloy C 2000 (Ni + Cr + Mo):206
+Inconel X-750 (Ni + Cr + Fe):212
+Invar:140
+Monel 400 (Ni + Cu):173
+Nimonic 90 (Ni + Cr + Co):213
+Nispan (Ni + Cr + Ti):165
+Phynox (Co + Cr + Ni + Mo):203
