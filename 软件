@@ -1,0 +1,33 @@
+以下是经过长期的软件筛选,只列出我们学校可能会涉及到的，毕竟网上很多都是坑，下载下来无法安装什么的。。。。有需要用到的破解的软件及流程可以找我来拷贝，备好移动硬盘
+
+
+
+
+Windows:
+Dreamweaver CC 2018.2 SP
+ANSYSACADEMICSTUDENT_2019R2_WINX64
+CATIA V5 6R2017 Win64 (不太建议安装)
+latexstudio (会用latex的同学可以安装，用来生成pdf文件)
+Matlab R2019a
+SecureCRT(x64/x86)
+VMware-ubuntu
+VMware(带秘钥)
+CentOS-6.9-x86_64 镜像(linux系统，同虚拟机一起安装)
+jdk1.7(不要使用新版本的jdk)
+Notepad++
+OriginLabOriginPro 9.0.0 (数学作图工具，适合参加比赛或者发表论文的同学)
+Photoshop CC 2019
+python-3.7.0
+SqlDeveloper (商业级数据库可视化软件，适合绑定oracle)
+wampserver2.5 (由于版本的问题，网上很多版本的wamp不稳定)
+Oracle 19C 19.6
+
+
+
+Mac:
+Adobe_DC
+JDK 12.0.2(新版本jdk可能会出问题，建议自己去搜1.7的拿来用)
+MyEclipse2018 (新手不友好，建议使用Eclipse )
+PS_2020
+PyCharm_2019.2.3
+WebStorm_2019.2.3
