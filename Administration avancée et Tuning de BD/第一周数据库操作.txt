@@ -1,0 +1,165 @@
+表空间（tablespace）、段（segment）、区（extent）、块（block），这些都是oracle数据库在数据文件中组织数据的基本单元。
+他们的关系是前者包含后者。Chap4 P48
+段（segment）是一种在数据库中消耗物理存储空间的任何实体（一个段可能存在于多个数据文件中，因为物理的数据文件是组成逻辑表空间的基本物理存储单位）
+
+下面主要记录一个实例，比如一个含有两个表的application: employe, dept
+1.需要创建表空间，首先需要确定每个表空间的大小（一半两个表空间：Table 和 Index）
+其中INDEX是索引，他的存在主要是对数据库表中的某些列进行排序，便于提高查询效率（在这个例子中的创建表的时候主键将使用INDEX的空间）
+
+首先，确定表空间的大小：
+比如：
+CREATE TABLE EMP
+       (EMPNO NUMBER(4) NOT NULL CONSTRAINT PK_EMP_EMPNO primary key,
+        ENAME VARCHAR2(10),
+        JOB VARCHAR2(9),
+        MGR NUMBER(4),
+        HIREDATE DATE,
+        SAL NUMBER(7, 2),
+        COMM NUMBER(7, 2),
+        DEPTNO NUMBER(2));
+
+//计算每个表占用的大小，从而给之前表空间定义初始SIZE
+
+SET SERVEROUTPUT ON
+DECLARE
+v_used_bytes NUMBER(10);
+v_Allocated_Bytes NUMBER(10);
+v_type sys.create_table_cost_columns;
+BEGIN
+v_Type := sys.create_table_cost_columns(            //每个表中的每一列所需要的大小。。。如果大小比如为（7，2），代表小数点前七位后两位
+sys.create_table_cost_colinfo('NUMBER',4),
+sys.create_table_cost_colinfo('VARCHAR2',10),
+sys.create_table_cost_colinfo('VARCHAR2',9),
+sys.create_table_cost_colinfo('NUMBER',4),
+sys.create_table_cost_colinfo('DATE',NULL),
+sys.create_table_cost_colinfo('NUMBER',7),
+sys.create_table_cost_colinfo('NUMBER',7),
+sys.create_table_cost_colinfo('NUMBER',2));
+DBMS_SPACE.CREATE_TABLE_COST('USERS',v_Type, 100000, 10,v_used_Bytes,v_Allocated_Bytes);     //计算我们需要的SIZE， 100000位置处为员工数或者数据条数，10为百分之十的预留的空间
+DBMS_OUTPUT.PUT_LINE('Used Bytes: ' || TO_CHAR(v_used_Bytes)
+|| ' Allocated Bytes: ' || TO_CHAR(v_Allocated_Bytes));
+END;
+比如运行的结果为25M左右，由于这个数据库中五六个表，其余的表都是小表，所以我们粗略估计为100M。接下来创建表空间：
+create tablespace TS_RH_TABLE
+datafile '/u02/app/oracle/oradata/BDMBDS/AAF2C343129312F9E0534AF61D0A9E57/datafile/TS_RH_TABLE_1.dbf'
+SIZE 100M
+EXTENT MANAGEMENT Local AUTOALLOCATE
+SEGMENT SPACE MANAGEMENT AUTO;
+
+索引（INDEX）表空间的大小约为主表空间的百分之二十：
+create tablespace TS_RH_INDEX
+datafile '/u02/app/oracle/oradata/BDMBDS/AAF2C343129312F9E0534AF61D0A9E57/datafile/TS_RH_INDEX_1.dbf'
+SIZE 20M
+EXTENT MANAGEMENT Local AUTOALLOCATE
+SEGMENT SPACE MANAGEMENT AUTO;
+
+删除表空间的例子如下：
+DROP TABLESPACE  TS_RH_TABLE
+INCLUDING CONTENTS AND DATAFILES
+CASCADE CONSTRAINTS;
+
+2. 创建表
+第一个表：占用索引大小为主表空间的大小25M的五分之一：5M
+CREATE TABLE EMP
+       (EMPNO NUMBER(4) NOT NULL CONSTRAINT PK_EMP_EMPNO primary key USING INDEX tablespace TS_RH_index  
+		STORAGE(
+		INITIAL 5M
+		NEXT 5M
+		MINEXTENTS 1
+		MAXEXTENTS UNLIMITED
+		PCTINCREASE 0
+		),
+        ENAME VARCHAR2(10),
+        JOB VARCHAR2(9),
+        MGR NUMBER(4),
+        HIREDATE DATE,
+        SAL NUMBER(7, 2),
+        COMM NUMBER(7, 2),
+        DEPTNO NUMBER(2))
+segment creation immediate
+TABLESPACE TS_RH_TABLE
+STORAGE(
+	INITIAL 25M
+	NEXT 25M
+	MINEXTENTS 1
+	MAXEXTENTS UNLIMITED
+	PCTINCREASE 0
+);
+
+//另外一个表。
+CREATE TABLE DEPT
+       (DEPTNO NUMBER(2) constraint pk_dept_deptno primary key
+       USING INDEX TABLESPACE TS_RH_INDEX
+       STORAGE(
+         inital 200K
+         NEXT 200K
+         MINEXTENTS 1
+         MAXEXTENTS UNLIMITED
+         PCTINCREASE 0
+       ),
+        DNAME VARCHAR2(14),
+        LOC VARCHAR2(13) )
+TABLESPACE TS_RH_TABLE
+STORAGE(
+  inital 1M
+  NEXT 1M
+  MINEXTENTS 1
+  MAXEXTENTS UNLIMITED
+  PCTINCREASE 0
+);
+
+//对于含主键小表来说，直接在primary key 后加
+TABLESPACE TS_RH_INDEX
+//并且和不含主键小表来说，直接在最后分号前加：意味着默认最小大小：64K
+TABLESPACE TS_RH_TABLE
+//例子：
+CREATE TABLE SALGRADE
+        (GRADE NUMBER primary key
+          using index TABLESPACE TH_RH_INDEX,
+         LOSAL NUMBER,
+         HISAL NUMBER)
+         TABLESPACE TS_RH_TABLE;
+CREATE TABLE DUMMY
+        (DUMMY NUMBER)
+        TABLESPACE TS_RH_TABLE;
+
+
+
+
+//非运行代码：
+//SEGEMENT的大小计算
+
+SEGEMENT EMP
+TIS = INITIAL +(MINEXTENTS-1)*NEXT;
+TIS DE EMP = 25M + (1-1)*NEXT = 25m
+
+SEGEMENT PK_EMP_EMPNO
+TIS = INITIAL +(MINEXTENTS-1)*NEXT;
+TIS DE EMP = 5M + (1-1)*NEXT = 5m
+
+//检查语句：
+//检查
+select * FROM user_tables
+where table_name
+in ('EMP','dept'.......);
+
+
+select * from user_indexes;
+
+
+select * from user_segments;
+
+//查看每个segment大小
+select * from user_extents order by segment_name, extent_id;
+
+//最后一定记得
+commit;
+
+
+
+// 如果遇到这个错误：  ORA-01950: tablespace 权限不足，需要进行如下解决
+
+alter user pdbadmin(用户名)
+quota unlimited on ts_rh_table
+quota unlimited on ts_rh_index;
+
