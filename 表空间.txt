@@ -1,0 +1,141 @@
+
+
+-application a deux 2 tables 
+employe
+dept
+
+
+//关于大小，看下面
+create tablespace TS_RH_TABLE
+datafile '/u02/app/oracle/oradata/BDMBDS/AAF2C343129312F9E0534AF61D0A9E57/datafile/TS_RH_TABLE_1.dbf'
+SIZE 100M
+EXTENT MANAGEMENT Local AUTOALLOCATE
+SEGMENT SPACE MANAGEMENT AUTO;
+
+// 大概百分之二十上面表空间的大小
+create tablespace TS_RH_INDEX
+datafile '/u02/app/oracle/oradata/BDMBDS/AAF2C343129312F9E0534AF61D0A9E57/datafile/TS_RH_INDEX_1.dbf'
+SIZE 20M
+EXTENT MANAGEMENT Local AUTOALLOCATE
+SEGMENT SPACE MANAGEMENT AUTO;
+
+//删除一个表空间
+DROP TABLESPACE  TS_RH_TABLE
+INCLUDING CONTENTS AND DATAFILES
+CASCADE CONSTRAINTS;
+
+比如：
+CREATE TABLE EMP
+       (EMPNO NUMBER(4) NOT NULL CONSTRAINT PK_EMP_EMPNO primary key USING INDEX tablespace TS_RH_index  
+		STORAGE(
+		INITIAL 5M
+		NEXT 5M
+		MINEXTENTS 1
+		MAXEXTENTS UNLIMITED
+		PCTINCREASE 0
+		),
+        ENAME VARCHAR2(10),
+        JOB VARCHAR2(9),
+        MGR NUMBER(4),
+        HIREDATE DATE,
+        SAL NUMBER(7, 2),
+        COMM NUMBER(7, 2),
+        DEPTNO NUMBER(2))
+segment creation immediate
+TABLESPACE TS_RH_TABLE
+STORAGE(
+	INITIAL 25M
+	NEXT 25M
+	MINEXTENTS 1
+	MAXEXTENTS UNLIMITED
+	PCTINCREASE 0
+);
+
+//举例另外一个表
+
+TABLESPACE TS_RH_TABLE
+STORAGE(
+	INITIAL 1M
+	NEXT 1M
+	MINEXTENTS 1
+	MAXEXTENTS UNLIMITED
+	PCTINCREASE 0
+);
+//对于小表，直接在最后分号前加： 无需声明大小
+
+TABLESPACE TS_RH_TABLE
+
+//在primary key 后加
+
+TABLESPACE TS_RH_INDEX
+
+
+
+
+
+
+
+//计算每个表占用的大小，从而给之前表空间定义初始SIZE
+
+SET SERVEROUTPUT ON
+DECLARE
+v_used_bytes NUMBER(10);
+v_Allocated_Bytes NUMBER(10);
+v_type sys.create_table_cost_columns;
+BEGIN
+v_Type := sys.create_table_cost_columns(            //每个表中的每一列所需要的大小。。。如果大小比如为（7，2），代表小数点前后
+sys.create_table_cost_colinfo('NUMBER',4),
+sys.create_table_cost_colinfo('VARCHAR2',10),
+sys.create_table_cost_colinfo('VARCHAR2',9),
+sys.create_table_cost_colinfo('NUMBER',4),
+sys.create_table_cost_colinfo('DATE',NULL),
+sys.create_table_cost_colinfo('NUMBER',7),
+sys.create_table_cost_colinfo('NUMBER',7),
+sys.create_table_cost_colinfo('NUMBER',2));
+DBMS_SPACE.CREATE_TABLE_COST('USERS',v_Type, 100000, 10,v_used_Bytes,v_Allocated_Bytes);     //计算我们需要的SIZE， 100000位置处为员工数，10为百分之预留的空间
+DBMS_OUTPUT.PUT_LINE('Used Bytes: ' || TO_CHAR(v_used_Bytes)
+|| ' Allocated Bytes: ' || TO_CHAR(v_Allocated_Bytes));
+END;
+
+
+
+
+//SEGEMENT,非运行
+
+SEGEMENT EMP
+TIS = INITIAL +(MINEXTENTS-1)*NEXT;
+TIS DE EMP = 25M + (1-1)*NEXT = 25m
+
+SEGEMENT PK_EMP_EMPNO
+TIS = INITIAL +(MINEXTENTS-1)*NEXT;
+TIS DE EMP = 5M + (1-1)*NEXT = 5m
+
+
+
+
+
+
+//检查
+select * FROM user_tables
+where table_name
+in ('EMP','dept'.......);
+
+
+select * from user_indexes;
+
+
+select * from user_segments;
+
+
+//   ORA-01950: tablespace 权限不足
+
+alter user pdbadmin(用户名)
+quota unlimited on ts_rh_table
+quota unlimited on ts_rh_index;
+
+
+
+//最后
+commit;
+//查看每个segment大小
+select * from user_extents order by segment_name, extent_id;
