@@ -111,5 +111,14 @@ C:\>java -jar %KVHOME%\lib\kvstore.jar ping -host localhost -port 5000
 C:\>java -jar %KVHOME%/lib/kvcli.jar -host localhost -port 5000 -store kvstore
 
 
+11.启动java指令前，需要进行如上第一部分操作：另外打开一个cmd作为服务器
 
+
+C:\>Set KVHOME=C:\logiciel\OracleNosql\kv-ee-20.2.16\kv-20.2.16
+//下载的例子所在的文件夹
+C:\>set MYTPHOME=C:\logiciel\TpOracle\tpnosql
+//只是把examples文件夹改名
+C:\>%MYTPHOME%/tpnosql_examples/hello/HelloBigDataWorld.java
+C:\>javac -g -cp %KVHOME%/lib/kvclient.jar;%MYTPHOME%/tpnosql_examples %MYTPHOME%/tpnosql_examples/hello/*.java
+C:\>java -Xmx256m -Xms256m  -cp %KVHOME%/lib/kvclient.jar ;%MYTPHOME%/tpnosql_examples hello.HelloBigDataWorld
 
