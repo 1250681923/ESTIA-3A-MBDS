@@ -122,3 +122,53 @@ C:\>%MYTPHOME%/tpnosql_examples/hello/HelloBigDataWorld.java
 C:\>javac -g -cp %KVHOME%/lib/kvclient.jar;%MYTPHOME%/tpnosql_examples %MYTPHOME%/tpnosql_examples/hello/*.java
 C:\>java -Xmx256m -Xms256m  -cp %KVHOME%/lib/kvclient.jar ;%MYTPHOME%/tpnosql_examples hello.HelloBigDataWorld
 
+
+//Nosql练习题
+
+kv-> put kv -key /cle1 -value "une valeur";
+Operation successful, record inserted.
+kv-> put kv -key /cle1 -value "une valeur" -if-absent;
+Operation failed, A value was already present with the given key /cle1.
+
+kv-> put kv -key /bob/smith/bob.smith@gmail.com-/telephone -value "123456789";
+Operation successful, record inserted.
+kv-> put kv -key /bob/smith/bob.smith@gmail.com-/adresse -value "6 rue de Minerva";
+Operation successful, record inserted.
+kv-> delete kv -key /bob/smith -all;
+2 Keys deleted starting at /bob/smith
+
+kv-> execute 'create table pilote(plnum INTEGER, plnom STRING, dnaiss STRING,adr STRING, PRIMARY KEY(shard(plnom,adr),plnum))';
+Statement completed successfully
+
+
+kv-> execute 'create table pilote.CV(cvnum INTEGER, cvlangue STRING, cvtexte binary, Cvanime binary, PRIMARY KEY(cvnum))';
+Statement completed successfully
+
+
+kv-> put table -name pilote -json'{"plnum":1,"plnom":"Gagarin1","dnaiss":"09/03/1934","adr":"Klouchino1, Russie"}';
+
+kv-> show tables -name pilote -json;
+
+kv-> get table -name pilote;
+{"plnum":1,"plnom":"Gagarin1","dnaiss":"09/03/1934","adr":"Klouchino1, Russie"}
+
+kv-> get table -name pilote -field plnum -value 1;
+Error handling command get table -name pilote -field plnum -value 1: A required field is missing from the Primary Key
+
+kv-> get table -name pilote -field plnom -value "Gagarin1" -field adr -value "Klouchino1, Russie" -field plnum -value 1;
+{"plnum":1,"plnom":"Gagarin1","dnaiss":"09/03/1934","adr":"Klouchino1, Russie"}
+
+
+
+kv-> execute 'create index idx_pilte_adr on pilote(adr)'
+Statement completed successfully
+
+kv-> get table -name pilote -field adr -value "Klouchino1, Russie" -index idx_pilte_adr
+{"plnum":1,"plnom":"Gagarin1","dnaiss":"09/03/1934","adr":"Klouchino1, Russie"}
+
+1 row returned
+
+//例子，之前没有插入
+kv-> get table -name pilote2 - field plnom -value "Gagarin2" -child pilote2.checkup
+
+
