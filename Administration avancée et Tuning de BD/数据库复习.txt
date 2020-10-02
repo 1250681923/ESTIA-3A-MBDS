@@ -1,0 +1,137 @@
+Chap1_2
+
+Oracle 12C 之后的新特性
+1.Oracle
+Multitenant Database Architecture(1 instance, N BD)
+ou container Database
+2. Oracle In-Memory Database Architecture
+3. Oracle Sharding Database Architecture
+(partitionnement horizontal d’une table sur N bases)
+4.完善定义数据：添加identify
+5.SYSBACKUP
+
+
+Instance
+
+12c之前=Cache memoire Oracle(une SGA+une PGA)+des background Process
+
+也是： Une SGA, des background process, des process Serveurs
+
+Jusqu'a 4000 PDBs par CDB
+Advantage: 
+1. conomies des ressources mémoires : une seule instance, plusieurs BD
+2.adapté pour le cloud computing
+
+CDB时
+CDB文件包括
+Les fichiers de donnee(tablespaces system, sysaux, undo, temp)
+Les fichiers de controle
+Les fichiers REDOLOG
+
+PDB文件包括
+Les fichiers de donnee(tablespaces system, sysaux, undo, temp)
+Les fichiers des tablespaces des applications
+
+
+Non CDB: Database Metadata et User Metadata mélangé
+CDB: CDB$ROOT Metadata :Database Metadata uniquement      PDB Metadata :User Metadata uniquement
+
+CDB是很多PDB的上层， PDB相互独立
+
+Architecture RAC : 1. Au niveau de chaque Database Server, il y a une instance qui tourne.
+Plusieurs serveurs permettent d'acceder a la meme base
+2. Permet :LA HAUTE DISPOINIBILITE, LA MONTEE EN CHARGE
+3.Les Databases Server peuvent être CDB ou NON CDB
+
+
+Architecture Oracle 12c Data guard permet de se protéger contre la destruction complète d’un site
+
+
+Oracle 18c+19c : Une des innovations forte de ces versions est ORACLE AUTONOMOUS Database
+= Complete Infrastructure Automation + Complete Database Automation + Automated Data Center Operations and Machine Learning
+
+SGA 中的Large pool 用来备份和储存
+
+
+PGA est une zone de mémoire privée
+Pour une base de données OLTP, la PGA peut être de 20% environ de taille totale de la mémoire allouée à Oracle
+
+如果数据库立马关闭了，只有SMON和PMON在运行，文件依旧存在
+
+
+归档模式关闭时，无法恢复，开启时，做的操作都有备份
+
+
+
+
+
+------------------------------------------------
+Charptre 3
+数据库包括以下一个状态
+1.数据库关闭
+2.数据库没上线 NOMOUNT 
+instance demarree 
+Utilisation: creation d'une base, creer un ficher de controle
+3.数据库上线 MOUNT
+Instance demarree et fichiers de controle ouverts
+Utilisation: taches de maintenance tels que renommer les fichers, activer/desactiver le mode avec archiver,  recouvrer les donnnees
+4.数据库开启 OPEN
+instance demarree fichiers de controle et de donnees ouverts
+Utilisation: mode de fonctionnement normal
+
+
+------------------------------------------------
+Charptre 4
+从ORACLE　12c 开始， 一个数据库可以是NON CDB 或者CDB
+
+
+NON CDB文件包括：
+• des Fichiers de données
+• des fichiers REDO LOG
+• des fichiers de contrôle
+• des fichiers d'Archivage (si fonctionnement avec
+Archive)
+
+
+
+Les Fichiers Redo-Log
+Configuration minimale (au moins 2 groupes avec au moins un fichier chacun)
+
+Utilisation en mode multiplexés (au moins deux groupes)
+• Un groupe à au moins 2 fichiers qui sont identiques en contenu et mis à jour simultanément
+• il est conseillé de stocker chaque fichier d'un même groupe sur des disques différents
+• il est conseillé d'avoir un même nombre de membres par groupe
+
+
+
+表空间
+BD tablespaces segments, extensions, blocks一包多的关系
+
+
+la taille d'un bloc Oracle dépend de l'OS (2K, 4K, 8K, 16K, 32K)
+
+
+–extensions的大小
+TIS <1Mo
+alors
+TIS/64=NE extensions de 64K +1
+si reste
+TIS/64>0
+–
+TIS < 8 Mo
+alors
+TIS/1024=NE extension de 1Mo + 1
+si reste
+TIS/1024>0
+–
+TIS < 64Mo
+alors
+TIS/8= NE extensions de 8Mo +M
+extensions de 1M
+si reste TIS/8 >0
+–
+TIS >= 64Mo
+alors
+TIS/64= NE extensions de 64Mo +M
+extensions de 8M
+si reste TIS/64 >
