@@ -1,0 +1,115 @@
+Installation Oracle NOSQL sous windows 10
+
+1.	Lien vers le fichier à télécharger 
+https://www.oracle.com/database/technologies/nosql-database-server-downloads.html
+Télécharger la version .zip
+
+Créer sur votre disque C : ou D : un répertoire ou déposer le ZIP
+ 
+Exemple 
+D:\>Logiciels\OracleNoSql2020_2021
+
+
+
+2.	Dézipper le ZIP
+
+ 
+
+3.	Vérifier l’installation
+
+java -Xmx256m -Xms256m -jar D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16\lib\kvclient.jar
+On voit la réponse suivante 
+20.2.16 2020-07-30 12:46:22 UTC  Build id: e07f6d7d73f3 Edition: Client
+
+4.	Vérifier la version java
+D:\>java -version
+java version "11.0.1" 2018-10-16 LTS
+Java(TM) SE Runtime Environment 18.9 (build 11.0.1+13-LTS)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.1+13-LTS, mixed mode)
+
+
+5.	Vérification de la variable d’environnement JAVA_HOME
+echo %JAVA_HOME%
+6.	Fixer la variable d’environnement KVHOME
+D:\> Set KVHOME=D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16
+//Set KVHOME=C:\logiciel\OracleNosql\kv-ee-20.2.16\kv-20.2.16
+7.	Activation du serveur NOSQL KVLITE
+java -Xmx256m -Xms256m -jar %KVHOME%/lib/kvstore.jar kvlite -secure-config disable
+8.	Exécuter un ping pour vérifier le serveur fonctionne
+Cmd 
+D:
+D:\>
+java -jar %KVHOME%\lib\kvstore.jar ping -host localhost -port 5000
+/*
+D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16>java -jar %KVHOME%\lib\kvstore.jar ping -host localhost -port 5000
+Pinging components of store kvstore based upon topology sequence #14
+10 partitions and 1 storage nodes
+Time: 2020-10-01 20:35:13 UTC   Version: 20.2.16
+Shard Status: healthy:1 writable-degraded:0 read-only:0 offline:0 total:1
+Admin Status: healthy
+Zone [name=KVLite id=zn1 type=PRIMARY allowArbiters=false masterAffinity=false]   RN Status: online:1 read-only:0 offline:0
+Storage Node [sn1] on Gabriel:5000    Zone: [name=KVLite id=zn1 type=PRIMARY allowArbiters=false masterAffinity=false]    Status: RUNNING   Ver: 20.2.16 2020-07-30 12:46:22 UTC  Build id: e07f6d7d73f3 Edition: Enterprise
+        Admin [admin1]          Status: RUNNING,MASTER
+        Rep Node [rg1-rn1]      Status: RUNNING,MASTER sequenceNumber:307 haPort:5006 available storage size:1023 MB
+*/
+9.	Utilisation du CLI : Client ligne de Commande
+d:\> Set KVHOME=D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16
+
+activation du client et connexion à la base kvstore
+d:\> java -jar %KVHOME%/lib/kvcli.jar -host localhost -port 5000 -store kvstore
+kv-> put kv -key /test -value "un test"
+Operation successful, record inserted.
+kv-> get kv -key /test
+un test
+kv-> put kv -key /test -value "un test version 2"
+Operation successful, record updated.
+
+
+10.	Utilisation du client SQL
+-- SQL dans Oracle NOSQL
+https://docs.oracle.com/en/database/other-databases/nosql-database/18.1/sqlfornosql/running-shell.html
+d:\> Set KVHOME=D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16
+d:\> java -jar %KVHOME%/lib/sql.jar -helper-hosts localhost:5000 -store kvstore
+sql-> select * from clients;
+{"id":"1","Nom":"ERZULIE","prenom":"Frida","date_naissance":"1960-10-10T00:00:00.000000000"}
+
+1 row returned
+sql->
+
+11.	Compilation et exécution du code java sur la ligne de commande
+
+d:\> Set KVHOME=D:\Logiciels\OracleNoSql2020_2021\kv-ee-20.2.16\kv-20.2.16
+-- compilation
+set MYTPHOME=D:\TpOracle\tpnosql
+
+Télécharger les exemples de code java et déposé les dans le dossier MYTPHOME 
+https://www.oracle.com/database/technologies/nosql-database-server-downloads.html
+Renommer le dossier examples en tpnosql_examples
+Sous MYTPHOME :
+%MYTPHOME%/tpnosql_examples/hello/HelloBigDataWorld.java
+
+-- compilation
+javac -g -cp %KVHOME%/lib/kvclient.jar;%MYTPHOME%/tpnosql_examples %MYTPHOME%/tpnosql_examples/hello/*.java
+-- Exécution
+d:\>  java -Xmx256m -Xms256m  -cp %KVHOME%/lib/kvclient.jar ;%MYTPHOME%/tpnosql_examples hello.HelloBigDataWorld
+Hello Big Data World!
+
+12.	Ww
+13.	Xx
+14.	Dd
+
+//再次使用，需要打开两个命令窗口
+第一个输入
+C:\>Set KVHOME=C:\logiciel\OracleNosql\kv-ee-20.2.16\kv-20.2.16
+C:\>java -Xmx256m -Xms256m -jar %KVHOME%/lib/kvstore.jar kvlite -secure-config disable
+
+
+
+第二个输入
+C:\>Set KVHOME=C:\logiciel\OracleNosql\kv-ee-20.2.16\kv-20.2.16
+C:\>java -jar %KVHOME%\lib\kvstore.jar ping -host localhost -port 5000
+C:\>java -jar %KVHOME%/lib/kvcli.jar -host localhost -port 5000 -store kvstore
+
+
+
+
