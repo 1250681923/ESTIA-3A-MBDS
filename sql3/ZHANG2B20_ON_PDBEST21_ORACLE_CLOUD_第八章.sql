@@ -208,3 +208,131 @@ commit;
 
 ///
 select * from dept_o;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+08/10/2020
+	
+-- Chap_1_8.5.1 Modifier la localité d'un département connaissant son 
+-- nom
+UPDATE  DEPT_O
+SET   LOC = 'BAYONNE'	
+WHERE 	DNAME = 'RH';
+rollback;
+
+
+-- Chap_1_8.5.2 Modifier la date d'embauche d'un Employé connaissant 
+-- son nom sachant qu'il doit travailler dans l'un des départements 
+-- suivants : 'Recherche', 'Finance' ou  'RH'
+UPDATE EMPLOYE_O oe
+SET DATE_EMB = to_date('08-10-2020','DD-MM-YYYY')
+WHERE ENAME = 'BARON' AND oe.refdept.dname in ('Recherche', 'Finance', 'RH');
+
+
+-- Chap_1_8.5.3 Supprimer un DEPT et mettre la référence vers le 
+-- département à null 
+-- dans la table employe_o
+	
+
+-- solution 1 : lente 
+DECLARE
+redept1		 REF dept_T;
+
+BEGIN
+	DELETE FROM dept_o V6 WHERE deptno = 1000
+		RETURNING REF(v6)	INTO refDept1;
+		
+	update employe_o oe
+	set oe.refDept=null
+	where oe.refDept=refDept1;
+END;
+/
+
+-- solution 2 : rapide
+update employe_o o set o.refdept = null 
+where o.refdept.deptno = 1000;
+
+delete from dept_o o where deptno=1000;
+
+	
+	
+	
+	
+	
+-- Chap_1_8.6.1 Faire un Listing des DEPTs triés par nom
+SELECT * FROM dept_o
+ORDER BY DNAME;
+
+-- Chap_1_8.6.2 Pour un DEPT donné, lister tous les EMPLOYEs qui y 
+-- travaillent PL/SQL et Procédures stockées
+
+---solution 1
+select lre.column_value.ename,
+lre.column_value.empno,
+lre.column_value.refDept.deptno,
+lre.column_value.refDept.dname,
+lre.column_value.sal
+from TABLE(select od.listRefEmp
+from dept_o od where od.deptno = 1000) lre;
+----solution 2
+Select oe.ename, oe.empno,oe.refdept.deptno,oe.refdept.dname, oe.sal 
+from employe_o oe
+where oe.refdept.deptno=1000;
+--solution 3
+SELECT od.listRefEmp
+from dept_o od, TABLE(od.listRefEmp)
+where od.deptno = 1000;
+	
+	
+	
+-- Chap_1_8.1 Implémenter les méthodes du type EMPLOYE_T
+-- Ci-dessous une implémentation à vide à compléter en remplaçant
+-- null par du vrai code. Le code null permet une implémentation
+-- incrémentatale. En effet PLSQL toutes les fonctions d'un package
+-- doivent être codées avant d'être testez
+-- Les prototypes des fonctions doivent être identiques
+-- à la spécification.
+
+
+
+create or replace type BODY EMPLOYE_T AS 
+ORDER MEMBER FUNCTION compEMP (emp IN EMploye_t) RETURN NUMBER IS
+	position1 NUMBER :=0;
+	position2 NUMBER :=0;
+	concEmp1 VARCHAR2(60) := SELF.empno||SELF.ename;
+	concEmp2 VARCHAR2(60) := emp.empno||emp.ename;
+	BEGIN
+		CASE SELF.job
+			WHEN 'PDG' THEN position1 := 1;
+			WHEN 'Directeur' THEN position1 := 2;
+			WHEN 'Ingénieur' THEN position1 := 3;
+			WHEN 'Secrétaire' THEN position1 := 4;
+			WHEN 'Planton' THEN position1 := 5;
+		END CASE;
+		CASE emp.job
+			WHEN 'PDG' THEN position2 := 1;
+			WHEN 'Directeur' THEN position2 := 2;
+			WHEN 'Ingénieur' THEN position2 := 3;
+			WHEN 'Secrétaire' THEN position2 := 4;
+			WHEN 'Planton' THEN position2 := 5;
+		END CASE;
+		concEmp1 := position1||concEmp1;
+		concEmp2 := position2||concEmp2;
+		--11KING
+		--22BARON
+		IF concEmp1 = concEmp2 THEN return 0;
+		ELSIF concEmp1 > concEmp2 THEN return 1;
+		ELSIF concEmp1 < concEmp2 THEN return -1;
+		END IF;
+	END;
+end;
+/
+
+
