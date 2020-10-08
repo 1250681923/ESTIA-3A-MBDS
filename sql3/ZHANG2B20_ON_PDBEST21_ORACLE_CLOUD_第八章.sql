@@ -336,3 +336,52 @@ end;
 /
 
 
+-- Chap_1_8.2 Implémenter les méthodes du type DEPT_T
+-- Ci-dessous une implémentation à vide à compléter en remplaçant
+-- null par du vrai code. Le code null permet une implémentation
+-- incrémentatale. En effet PLSQL toutes les fonctions d'un package
+-- doivent être codées avant d'être testez
+-- Les prototypes des fonctions doivent être identiques
+-- à la spécification.
+
+
+    
+create or replace type BODY DEPT_T AS
+
+static function getDept (deptno1 IN number)
+    return dept_t IS
+BEGIN
+    null;
+END;
+Static function getInfoEmp(deptno1 IN number)
+    return setEmployes_t IS
+BEGIN
+    null;
+END;
+member procedure addLinkListeEmployes(RefEmp1 REF Employe_t) IS
+BEGIN
+    null;
+END;
+member procedure deleteLinkListeEmployes (RefEmp1 REF Employe_t) IS
+BEGIN
+    null;
+END;
+member procedure updateLinkListeEmployes (RefEmp1 REF Employe_t,
+    RefEmp2 REF Employe_t) IS
+BEGIN
+    null;
+END;
+
+map member function compDept return varchar2 IS
+BEGIN
+	return self.deptno || self.dname || self.loc;
+END;
+end;
+/
+
+
+-- Chap_1_8.3 Tester chaque méthode du type EMPLOYE_T
+select * from employe_o oe order by value(oe);
+-- Chap_1_8.4 Tester chaque méthode du type DEPT_T
+--test de compDept
+select * from dept_o od order by value(od);
