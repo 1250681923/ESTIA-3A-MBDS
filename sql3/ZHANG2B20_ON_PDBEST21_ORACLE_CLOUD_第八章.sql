@@ -350,8 +350,14 @@ create or replace type BODY DEPT_T AS
 
 static function getDept (deptno1 IN number)
     return dept_t IS
+dept1 dept_t:=null;
 BEGIN
-    null;
+    select value(od) INTO dept1 
+	from dept_o od where od.deptno = deptno1;
+	return dept1;
+	EXCEPTION
+		WHEN OTHERS THEN
+			raise;
 END;
 Static function getInfoEmp(deptno1 IN number)
     return setEmployes_t IS
@@ -385,3 +391,18 @@ select * from employe_o oe order by value(oe);
 -- Chap_1_8.4 Tester chaque méthode du type DEPT_T
 --test de compDept
 select * from dept_o od order by value(od);
+	
+--test de getDept
+set serveroutput on
+declare
+dept1 dept_t;
+begin
+	dept1:=dept_t.getDept(1000);
+	dbms_output.put_line('dname'||dept1.dname);
+	EXCEPTION
+		WHEN OTHERS THEN
+		dbms_output.put_line('Erreur dans le programme');
+		dbms_output.put_line('sqlcode='||sqlcode);
+		dbms_output.put_line('sqlerrm='||sqlerrm);
+end;
+/
