@@ -356,11 +356,11 @@ BEGIN
 	from dept_o od where od.deptno = deptno1;
 	return dept1;
 	EXCEPTION
-		WHEN OTHERS THEN
-			raise;
+	WHEN OTHERS THEN
+	raise;
 END;
 Static function getInfoEmp(deptno1 IN number)
-    return setEmployes_t IS
+    	return setEmployes_t IS
 	setEmp setEmployes_t;
 BEGIN
 	SELECT cast(collect(deref(lre.column_value)) 
@@ -373,16 +373,25 @@ BEGIN
 END;
 member procedure addLinkListeEmployes(RefEmp1 REF Employe_t) IS
 BEGIN
-    null;
+    	INSERT INTO
+	TABLE(SELECT od.listRefEmp
+	FROM dept_o od
+	WHERE od.deptno = self.deptno)
+	values (RefEmp1);
 END;
 member procedure deleteLinkListeEmployes (RefEmp1 REF Employe_t) IS
 BEGIN
-    null;
+    	DELETE FROM dept_o
+	WHERE RefEmp1 IN
+	(SELECT od.listRefEmp
+	FROM dept_o od
+	WHERE od.deptno = self.deptno);
 END;
 member procedure updateLinkListeEmployes (RefEmp1 REF Employe_t,
     RefEmp2 REF Employe_t) IS
 BEGIN
-    null;
+    	deleteLinkListeEmployes(RefEmp1);
+	addLinkListeEmployes(RefEmp2);	
 END;
 
 map member function compDept return varchar2 IS
