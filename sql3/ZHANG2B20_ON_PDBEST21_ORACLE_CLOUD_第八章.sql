@@ -378,22 +378,30 @@ BEGIN
 	FROM dept_o od
 	WHERE od.deptno = self.deptno)
 	values (RefEmp1);
+	EXCEPTION
+	WHEN OTHERS THEN
+		raise;
 END;
 member procedure deleteLinkListeEmployes (RefEmp1 REF Employe_t) IS
 BEGIN
-    	DELETE FROM dept_o
-	WHERE RefEmp1 IN
-	(SELECT od.listRefEmp
+    	DELETE FROM
+   	TABLE(SELECT od.listRefEmp
 	FROM dept_o od
-	WHERE od.deptno = self.deptno);
+	WHERE od.deptno = self.deptno) lre
+	WHERE lre.column_value = RefEmp1;
+	EXCEPTION
+	WHEN OTHERS THEN
+		raise;
 END;
 member procedure updateLinkListeEmployes (RefEmp1 REF Employe_t,
     RefEmp2 REF Employe_t) IS
 BEGIN
     	deleteLinkListeEmployes(RefEmp1);
-	addLinkListeEmployes(RefEmp2);	
+	addLinkListeEmployes(RefEmp2);
+	EXCEPTION
+	WHEN OTHERS THEN
+		raise;
 END;
-
 map member function compDept return varchar2 IS
 BEGIN
 	return self.deptno || self.dname || self.loc;
@@ -417,6 +425,85 @@ begin
 	dbms_output.put_line('dname'||dept1.dname);
 	EXCEPTION
 		WHEN OTHERS THEN
+		dbms_output.put_line('Erreur dans le programme');
+		dbms_output.put_line('sqlcode='||sqlcode);
+		dbms_output.put_line('sqlerrm='||sqlerrm);
+end;
+/
+
+-- test de la fonction getInfoEmp		    		    		    
+set serveroutput on
+declare
+setEmp	 setEmployes_t;
+deptno1  dept_o.deptno%type:=1000;
+dept1 dept_t;
+begin
+	setEmp:=dept_t.getInfoEmp(deptno1);
+	-- dbms_output.put_line('dname='||dept1.dname);
+	--dept1:=dept_t.getDept(deptno1);
+	-- dbms_output.put_line('dname='||dept1.dname);
+	for i in setEmp.first .. setEmp.last
+	loop
+		dbms_output.put_line('ename='||setEmp(i).ename);
+		-- dbms_output.put_line('dname='||setEmp(i).refDept.dname);
+		UTL_REF.SELECT_OBJECT (setEmp(i).refDept, dept1);
+		dbms_output.put_line('dname='||dept1.dname);
+		
+	end loop;
+
+	EXCEPTION
+		WHEN OTHERS THEN
+			dbms_output.put_line('Erreur dans le programme');
+			dbms_output.put_line('sqlcode='||sqlcode);
+			dbms_output.put_line('sqlerrm='||sqlerrm);
+end;
+/
+			    
+			    
+--test addLinkListeEmployes
+set serveroutput on
+declare
+	emp4 Employe_t :=employe_t(
+	4,
+	'SCHMITT',
+	TABPRENOMS_T('Helmut'),
+	'Planton',
+	1500,
+	'chancelier',
+	to_date('12-11-1930', 'DD-MM-YYYY'),
+	to_date('12-11-2020', 'DD-MM-YYYY'),
+	null
+	);
+	refEmp4 REF employe_t;
+	dept1000 dept_t;
+	refDept1000 ref dept_t;
+begin
+	select value(od), ref(od) into dept1000, refDept1000
+	from dept_o od where od.deptno=1000;
+	emp4.refDept:=refDept1000;
+	insert into employe_o oe values (emp4) returning ref(oe) into refEmp4;
+	dept1000.addLinkListeEmployes(refEmp4);
+end;
+/
+select ename, oe.refDept.dname from employe_o oe;
+			    
+			    
+
+--test deleteLinkListeEmployes
+set serveroutput on
+declare
+	refEmp4 REF employe_t;
+	dept1000 dept_t;
+begin
+	select value(od) into dept1000
+	from dept_o od where od.deptno=1000;
+	select ref(oe) into refEmp4 from employe_o oe where oe.empno=4;
+	dept1000.deleteLinkListeEmployes(refEmp4);
+	update employe_o oe
+	set oe.refDept = null and ref(oe)
+	where oe.refDept.deptno = 1000;
+	EXCEPTION
+	WHEN OTHERS THEN
 		dbms_output.put_line('Erreur dans le programme');
 		dbms_output.put_line('sqlcode='||sqlcode);
 		dbms_output.put_line('sqlerrm='||sqlerrm);
