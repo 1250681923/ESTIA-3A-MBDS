@@ -366,7 +366,7 @@ BEGIN
 	SELECT cast(collect(deref(lre.column_value)) 
 	AS setEmployes_t) INTO setEmp
 	FROM TABLE(
-	SELECT listRefEmp 
+	SELECT od.listRefEmp 
 	from dept_o od 
 	where od.deptno = deptno1) lre;
 	return setEmp;
