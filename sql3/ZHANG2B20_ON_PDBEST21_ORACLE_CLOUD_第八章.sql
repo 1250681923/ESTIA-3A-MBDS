@@ -363,11 +363,13 @@ Static function getInfoEmp(deptno1 IN number)
     return setEmployes_t IS
 	setEmp setEmployes_t;
 BEGIN
-	SELECT collect(deref(lre.column_value)) INTO setEmp
-	FROM
-    TABLE(SELECT listRefEmp 
+	SELECT cast(collect(deref(lre.column_value)) 
+	AS setEmployes_t) INTO setEmp
+	FROM TABLE(
+	SELECT listRefEmp 
 	from dept_o od 
 	where od.deptno = deptno1) lre;
+	return setEmp;
 END;
 member procedure addLinkListeEmployes(RefEmp1 REF Employe_t) IS
 BEGIN
