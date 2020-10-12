@@ -16,7 +16,7 @@ server:
     contextPath: /tpmbds
 
 Grails Command
-grails s2 quickstart tpmbds User Role
+s2-quickstart tpmbds User Role
 
 //复制第一个url，environments： application.yml
 //http://localhost:8082/tpmbds/dbconsole上更改JDBC URL
